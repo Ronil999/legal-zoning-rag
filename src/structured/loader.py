@@ -4,6 +4,8 @@ src/structured/loader.py
 Lazy loaders for structured zoning/site datasets.
 """
 
+import os
+
 import pandas as pd
 
 from pathlib import Path
@@ -85,6 +87,13 @@ def get_site_records():
 def get_pluto():
 
     global _pluto_df
+
+    # PLUTO is supplementary (large citywide file, gitignored) —
+    # the 5 test BBLs are fully defined in site_records.csv, so a
+    # missing PLUTO file should degrade gracefully, not crash.
+    if _pluto_df is None and not os.path.exists(PLUTO_PATH):
+
+        return None
 
     if _pluto_df is None:
 

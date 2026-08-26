@@ -14,18 +14,9 @@ main.py controls execution flow.
 """
 
 import json
-import requests
 import re
 
-# ─────────────────────────────────────────────────────
-# OLLAMA CONFIG
-# ─────────────────────────────────────────────────────
-
-OLLAMA_URL = (
-    "http://localhost:11434/api/generate"
-)
-
-MODEL_NAME = "llama3"
+from src.generation.gemini_client import generate_text
 
 # ─────────────────────────────────────────────────────
 # ROUTING PROMPT
@@ -155,32 +146,32 @@ USER QUERY:
 Return ONLY valid JSON.
 """
 
-    payload = {
+    try:
 
-        "model": MODEL_NAME,
+        text = generate_text(
 
-        "prompt": prompt,
+            prompt=prompt,
 
-        "stream": False,
+            temperature=0.0,
 
-        "options": {
+            max_tokens=200
+        )
 
-            "temperature": 0.0
+    except Exception as e:
+
+        return {
+
+            "route": "legal_rag",
+
+            "confidence": 0.0,
+
+            "reason": (
+                f"Router request failed: {e}. "
+                "Defaulting safely to legal_rag."
+            ),
+
+            "query_year": query_year
         }
-    }
-
-    response = requests.post(
-
-        OLLAMA_URL,
-
-        json=payload,
-
-        timeout=120
-    )
-
-    response.raise_for_status()
-
-    text = response.json()["response"]
 
     # print("\nRAW ROUTER RESPONSE:\n")
 

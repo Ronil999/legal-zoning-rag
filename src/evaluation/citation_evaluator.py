@@ -13,17 +13,8 @@ Purpose:
 
 import re
 import json
-import requests
 
-# ─────────────────────────────────────────────────────
-# OLLAMA CONFIG
-# ─────────────────────────────────────────────────────
-
-OLLAMA_URL = (
-    "http://localhost:11434/api/generate"
-)
-
-MODEL_NAME = "llama3"
+from src.generation.gemini_client import generate_text
 
 # ─────────────────────────────────────────────────────
 # LEGAL / SPECULATIVE TERMS
@@ -233,32 +224,31 @@ ANSWER
 {answer}
 """
 
-    payload = {
+    try:
 
-        "model": MODEL_NAME,
+        text = generate_text(
 
-        "prompt": prompt,
+            prompt=prompt,
 
-        "stream": False,
+            temperature=0.0,
 
-        "options": {
+            max_tokens=400
+        )
 
-            "temperature": 0.0
+    except Exception as e:
+
+        return {
+
+            "grounded": False,
+
+            "grounding_score": 0.0,
+
+            "unsupported_claims": [],
+
+            "reason": (
+                f"Grounding request failed: {e}"
+            )
         }
-    }
-
-    response = requests.post(
-
-        OLLAMA_URL,
-
-        json=payload,
-
-        timeout=180
-    )
-
-    response.raise_for_status()
-
-    text = response.json()["response"]
 
     # -------------------------------------------------
     # EXTRACT JSON

@@ -264,18 +264,10 @@ STRICT RULES:
 6. If data is missing,
    explicitly state that it is unavailable.
 7. Keep answers concise and factual.
-
-Citation Rules:
-- ONLY cite using [SOURCE_X]
-- NEVER invent citations
-- NEVER write phrases like:
-  "according to SOURCE_X"
-  "citation:"
-  "retrieval warning"
-- NEVER reference sections unless explicitly present in context
-- Put citations ONLY at sentence ends
-- Example:
-  HVAC equipment may project into rear yards under limited conditions [SOURCE_3].
+8. Do NOT use citation markers like [SOURCE_X] —
+   no legal text was retrieved for this question,
+   so there is nothing to cite. Reference the
+   structured data by field name instead.
 
 ==================================================
 USER QUESTION
@@ -321,19 +313,26 @@ STRICT RULES:
 1. Use ONLY the provided context.
 2. Never invent zoning rules.
 3. Never fabricate legal conclusions.
-4. Cite supporting sections using
-   citation IDs like [SOURCE_1].
-5. If context is insufficient,
+4. Cite supporting sections from the
+   RETRIEVED LEGAL CONTEXT using citation
+   IDs like [SOURCE_1]. Only use citation
+   IDs that literally appear in that section.
+5. Facts drawn from STRUCTURED SITE DATA
+   (address, zoning district, FAR, etc.)
+   need NO citation marker at all — state
+   them plainly. Do NOT invent a citation ID
+   such as [SOURCE_SITE_DATA] for them.
+6. If context is insufficient,
    explicitly abstain.
-6. If warnings indicate missing sections,
+7. If warnings indicate missing sections,
    acknowledge uncertainty.
-7. Distinguish clearly between:
+8. Distinguish clearly between:
    - factual site data
    - zoning regulations
    - assumptions
-8. Prefer conservative legal interpretation.
-9. Do NOT cite sections not provided.
-10. Do NOT speculate beyond the corpus.
+9. Prefer conservative legal interpretation.
+10. Do NOT cite sections not provided.
+11. Do NOT speculate beyond the corpus.
 
 ==================================================
 USER QUESTION

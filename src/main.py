@@ -329,7 +329,7 @@ def run_intelli_site(
 
     print(
         "\n[STEP 5] "
-        "Generating answer with Ollama..."
+        "Generating answer with Gemini..."
     )
 
     answer = generate_answer(

@@ -70,21 +70,44 @@ def replace_inline_citations(
     citation_map: dict
 ):
 
-    formatted = answer
+    # ---------------------------------------------
+    # REPLACE [SOURCE_N] AND [SOURCE_N, SOURCE_M, ...]
+    # ---------------------------------------------
 
-    for cid, meta in citation_map.items():
+    def _resolve(match):
 
-        replacement = (
+        ids = re.findall(r"SOURCE_\d+", match.group(0))
 
-            f"[{meta['title']}]"
-        )
+        titles = []
 
-        formatted = formatted.replace(
+        seen = set()
 
-            f"[{cid}]",
+        for cid in ids:
 
-            replacement
-        )
+            meta = citation_map.get(cid)
+
+            if meta and meta["title"] not in seen:
+
+                seen.add(meta["title"])
+
+                titles.append(meta["title"])
+
+        # Unresolvable (references a source that was never
+        # retrieved) — drop the marker entirely rather than
+        # leave a raw citation ID in the answer.
+        if not titles:
+            return ""
+
+        return "[" + "; ".join(titles) + "]"
+
+    formatted = re.sub(
+
+        r"\[SOURCE_\d+(?:\s*,\s*SOURCE_\d+)*\]",
+
+        _resolve,
+
+        answer
+    )
 
     # ---------------------------------------------
     # CLEAN DUPLICATE CITATION LABELS
@@ -98,6 +121,14 @@ def replace_inline_citations(
 
         formatted
     )
+
+    # ---------------------------------------------
+    # TIDY WHITESPACE LEFT BY DROPPED CITATIONS
+    # ---------------------------------------------
+
+    formatted = re.sub(r"[ \t]+([.,;:])", r"\1", formatted)
+
+    formatted = re.sub(r"[ \t]{2,}", " ", formatted)
 
     return formatted
 

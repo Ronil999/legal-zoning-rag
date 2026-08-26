@@ -1,7 +1,6 @@
 import os
 import json
 import argparse
-import requests
 
 from datetime import datetime
 
@@ -9,8 +8,29 @@ from rich.console import Console
 from rich.table import Table
 
 from src.main import run_intelli_site
+from src.generation.gemini_client import generate_text
 
 console = Console()
+
+
+def _extract_json(text: str) -> dict:
+    """Parse a JSON object out of an LLM judge response,
+    tolerating markdown code fences despite instructions
+    not to use them."""
+
+    cleaned = text.strip()
+
+    if cleaned.startswith("```"):
+
+        cleaned = cleaned.strip("`")
+
+        cleaned = cleaned.split("\n", 1)[-1]
+
+        if cleaned.rstrip().endswith("```"):
+
+            cleaned = cleaned.rstrip()[:-3]
+
+    return json.loads(cleaned.strip())
 
 # =========================================================
 # TEST CASES
@@ -283,16 +303,33 @@ ABSTAIN_PHRASES = [
 def judge_grounding(
     question,
     chunks,
-    response
+    response,
+    site_summary=None
 ):
 
-    context = "\n\n".join(
+    legal_context = "\n\n".join(
 
         str(
             c.get("text", "")
         )[:1200]
 
         for c in chunks[:5]
+    )
+
+    site_context = "\n".join(
+
+        f"{k}: {v}"
+
+        for k, v in (site_summary or {}).items()
+
+        if v not in (None, "")
+    )
+
+    context = (
+
+        f"STRUCTURED SITE DATA:\n{site_context or '(none)'}"
+
+        f"\n\nLEGAL TEXT:\n{legal_context or '(none)'}"
     )
 
     prompt = f"""
@@ -302,6 +339,11 @@ TASK:
 Determine whether the answer contains claims NOT supported by the retrieved context.
 
 IMPORTANT:
+- The retrieved context below includes BOTH structured site data (from
+  the site's property record) AND retrieved legal text. Facts drawn from
+  either section are grounded — do not flag structured site facts
+  (address, zoning district, lot dimensions, FAR, etc.) as hallucinated
+  just because they only appear in the structured section.
 - Use ONLY the retrieved context.
 - Do NOT use outside knowledge.
 - If the answer adds unsupported legal rules, mark hallucination=true.
@@ -335,33 +377,16 @@ ANSWER:
 
     try:
 
-        r = requests.post(
+        raw = generate_text(
 
-            "http://localhost:11434/api/generate",
+            prompt=prompt,
 
-            json={
+            temperature=0,
 
-                "model": "llama3",
-
-                "prompt": prompt,
-
-                "stream": False,
-
-                "format": "json",
-
-                "options": {
-
-                    "temperature": 0,
-                    "num_predict": 200
-                }
-            },
-
-            timeout=120
+            max_tokens=300
         )
 
-        raw = r.json()["response"]
-
-        data = json.loads(raw)
+        data = _extract_json(raw)
 
         return {
 
@@ -399,16 +424,33 @@ ANSWER:
 def judge_abstention(
     case,
     response,
-    chunks
+    chunks,
+    site_summary=None
 ):
 
-    context = "\n\n".join(
+    legal_context = "\n\n".join(
 
         str(
             c.get("text", "")
         )[:1000]
 
         for c in chunks[:4]
+    )
+
+    site_context = "\n".join(
+
+        f"{k}: {v}"
+
+        for k, v in (site_summary or {}).items()
+
+        if v not in (None, "")
+    )
+
+    context = (
+
+        f"STRUCTURED SITE DATA:\n{site_context or '(none)'}"
+
+        f"\n\nLEGAL TEXT:\n{legal_context or '(none)'}"
     )
 
     prompt = f"""
@@ -419,6 +461,10 @@ Determine:
 - did the system abstain correctly?
 
 IMPORTANT:
+- The retrieved context below includes BOTH structured site data AND
+  retrieved legal text. Facts drawn from either section are grounded —
+  do not treat structured site facts as invented just because they
+  only appear in the structured section.
 - Use ONLY retrieved context.
 - If context is insufficient, abstention is correct.
 - If answer invents unsupported information, abstention is incorrect.
@@ -448,33 +494,16 @@ EXPECTED SHOULD ABSTAIN:
 
     try:
 
-        r = requests.post(
+        raw = generate_text(
 
-            "http://localhost:11434/api/generate",
+            prompt=prompt,
 
-            json={
+            temperature=0,
 
-                "model": "llama3",
-
-                "prompt": prompt,
-
-                "stream": False,
-
-                "format": "json",
-
-                "options": {
-
-                    "temperature": 0,
-                    "num_predict": 150
-                }
-            },
-
-            timeout=120
+            max_tokens=250
         )
 
-        raw = r.json()["response"]
-
-        data = json.loads(raw)
+        data = _extract_json(raw)
 
         return {
 
@@ -556,6 +585,11 @@ def run_case(case):
         []
     )
 
+    site_summary = result.get(
+        "site_summary",
+        {}
+    )
+
     console.print(
         f"[bold]Question:[/bold] {case['question']}"
     )
@@ -574,7 +608,9 @@ def run_case(case):
 
         chunks,
 
-        response
+        response,
+
+        site_summary
     )
 
     # =====================================================
@@ -587,7 +623,9 @@ def run_case(case):
 
         response,
 
-        chunks
+        chunks,
+
+        site_summary
     )
 
     abstention_ok = abstention.get(

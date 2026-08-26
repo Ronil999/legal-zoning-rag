@@ -59,6 +59,9 @@ def lookup_pluto_by_bbl(
 
     df = get_pluto()
 
+    if df is None:
+        return None
+
     normalized = normalize_bbl(bbl)
 
     matches = df[

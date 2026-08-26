@@ -5,6 +5,7 @@ rich
 pandas
 requests
 numpy
-streamlit 
-pytest 
+streamlit
+pytest
 rank-bm25
+google-genai
