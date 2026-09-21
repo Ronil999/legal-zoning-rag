@@ -4,7 +4,7 @@
 
 ## 1. Chunking Strategy
 
-**What I did:** Each of the ten zoning markdown files was split at the subsection level — meaning each numbered zoning section (e.g., `23-341`, `23-344`) becomes its own chunk, with the section number, title, amendment date, and a line range stored as metadata alongside the text. Chunks are written to `chroma_db/subsection_chunks.json` and indexed from there.
+**What I did:** Each of the fourteen zoning markdown files was split at the subsection level — meaning each numbered zoning section (e.g., `23-341`, `23-344`) becomes its own chunk, with the section number, title, amendment date, and a line range stored as metadata alongside the text. Chunks are written to `chroma_db/subsection_chunks.json` and indexed from there.
 
 **Why subsection-level, not paragraph or fixed-token:** Zoning text is already hierarchically structured. A subsection like "23-341 — Permitted Obstructions in Rear Yards" is a complete legal unit — it has a discrete scope, is directly cross-referenced by other sections, and is the natural unit an architect would cite. Splitting mid-subsection would break citation coherence and make it harder to validate grounding. Fixed-token chunking (e.g., 256 tokens) risks cutting across a regulatory condition mid-sentence, which is particularly dangerous in legal text where a single "except as provided in" clause changes meaning entirely.
 
@@ -41,7 +41,9 @@ The LLM router (`src/routing/router.py`) classifies each query into one of three
 | `legal_rag` | Questions requiring zoning text (FAR, yard depths, permitted uses, height/setback) | Hybrid retrieval + prompt with legal context |
 | `reject` | Questions entirely outside scope (federal law, GIS geometry, unrelated topics) | Return a scoped abstention message |
 
-The router is itself an LLM call (llama3 via Ollama) with a structured prompt asking for route + confidence + extracted query year. On parse failure or low confidence, it defaults to `legal_rag` — the safer direction, since over-retrieval is less harmful than missing a zoning constraint.
+The router is itself an LLM call (Gemini, `gemini-3.6-flash`, via `src/generation/gemini_client.py`) with a structured prompt asking for route + confidence + extracted query year. On parse failure or low confidence, it defaults to `legal_rag` — the safer direction, since over-retrieval is less harmful than missing a zoning constraint.
+
+> This originally ran on a local Ollama/llama3 model; the router, generation, and LLM-as-judge evaluation were all migrated to the Gemini API. See [`eval_stats.md`](eval_stats.md) for the before/after eval comparison.
 
 **Why a separate router instead of always doing RAG:** Structured questions (e.g., "what flood zone is this site in?") have deterministic answers in `site_records.csv`. Running them through vector retrieval adds latency and can introduce hallucinated zoning text into an otherwise clean factual answer. Keeping the paths separate also makes each path easier to debug and evaluate independently.
 
@@ -51,7 +53,7 @@ The router is itself an LLM call (llama3 via Ollama) with a structured prompt as
 
 **When retrieval returns nothing above threshold:** The prompt builder receives an empty context and is instructed to respond with an explicit abstention: "The corpus does not contain sufficient information to answer this question." The system will not generate an answer from parametric memory alone.
 
-**When retrieved chunks exist but don't answer the question:** The validator (`src/generation/validator.py`) checks for the presence of inline citations (`[SOURCE_X]`) in the generated answer. An answer with no citations on a `legal_rag` route is flagged. The citation evaluator then uses Ollama-as-judge to ensure grounding.
+**When retrieved chunks exist but don't answer the question:** The validator (`src/generation/validator.py`) checks for the presence of inline citations (`[SOURCE_X]`) in the generated answer. An answer with no citations on a `legal_rag` route is flagged. The citation evaluator (`src/evaluation/citation_evaluator.py`) then uses Gemini-as-judge to ensure grounding.
 
 **Vintage conflicts:** The temporal layer checks each cited chunk's `last_amended` year against the current or query year. If a query asks about "the FAR five years ago" and the only available chunk reflects a 2019 amendment, the system emits a warning rather than silently answering with potentially stale law. The severity of the warning is tiered: a `⚠️ WARNING` is emitted when a temporal conflict is possible, and a `🚨 DANGER` is emitted when the temporal gap is large enough to indicate high instability — meaning the cited regulation is very likely to have changed since the chunk was last amended.
 
@@ -65,13 +67,11 @@ The router is itself an LLM call (llama3 via Ollama) with a structured prompt as
 
 See [`eval_stats.md`](eval_stats.md) for full retrieval metrics and end-to-end evaluation results across 20 test cases.
 
-**Summary:** 1 PASS, 10 PARTIAL, 9 FAIL across 20 cases. The partial and fail results mostly reflect two failure modes:
+**Summary (current, Gemini-based pipeline):** 13 PASS, 1 PARTIAL, 6 FAIL across 20 cases, with 19/20 cases scoring a perfect grounding score (fully supported, no hallucination). This is a large jump from the original llama3/Ollama baseline of 1 PASS / 10 PARTIAL / 9 FAIL, and it comes from two things: switching generation, routing, and judging to Gemini (`gemini-3.6-flash`), and fixing a judge-side context-truncation bug uncovered during that migration (retrieved chunks were being cut to 1,000–1,200 characters, which chopped some sections mid-clause and produced false hallucination flags).
 
-1. **Grounding failures on answerable cases** — the LLM generates plausible-sounding zoning answers that are not tightly cited to the retrieved chunks. This is a prompt engineering and model-capability issue; llama3-8b struggles to stay citation-anchored on complex legal reasoning.
+Every remaining FAIL now shares one pattern rather than two: all 6 FAILs have a perfect grounding score and no hallucination — the only thing marked wrong is the abstention call. In each case the system answers the general rule fully and correctly, then explicitly flags the one specific fact it can't confirm from the retrieved context (e.g., Case 8 — Setback requirement — states the R7A base-height/setback rule correctly, then declines to say whether *this particular building* needs the setback because its exact height isn't in the site record). The eval's abstention field is binary, so it can't score "answered the covered part, abstained on the uncovered part" as correct — it counts this honest partial answer as a miss in whichever direction it leans. Case 7 (Street wall requirement) is the one genuine grounding slip, introducing an unsupported term not present in the retrieved text.
 
-2. **Incorrect abstention on answerable cases** (e.g., Case 8 — Setback requirement) — the router or retriever failed to surface the correct chunk, causing the LLM to abstain on a question the corpus does support. Improving threshold tuning and graph expansion key normalization would address most of these.
-
-Retrieval precision (18.42%) is low due to dependency expansion returning chunks that are technically related but not the expected answer chunk. Recall (77.78%) is healthy — the correct chunk is almost always in the retrieved set; the issue is that the LLM doesn't always use it well.
+Retrieval precision (18.92%) is unchanged from the pre-migration baseline (previously 18.42%) — expected, since only the LLM provider changed, not the retriever. It stays low because dependency expansion and hybrid RRF fusion return chunks that are topically related but not the expected answer chunk. Recall (77.78%) is healthy — the correct chunk is almost always in the retrieved set. Full metrics, per-case tables, and the bug writeups are in [`eval_stats.md`](eval_stats.md).
 
 ---
 
@@ -93,4 +93,6 @@ The current submission builds on the lessons from both branches.
 **Known vulnerabilities in the current system:**
 
 - The retrieval pipeline lacks a robust eval strategy — precision/recall are measured against manually defined expected chunks, which is brittle and doesn't scale.
-- The LLM is too weak for the task in several cases. A representative failure: when a query is about an R6 site and the retrieved context mentions regulations applying to "R1 through R10," the model sometimes abstains because it does not reason that R6 falls within that range. A stronger model, or a structured reasoning step before generation, would catch this.
+- The abstention rubric is binary (did/should abstain) and can't represent a correct partial answer — "answered the covered part, abstained on the uncovered part" — as a good outcome. This is now the dominant failure mode after the Gemini migration (see Section 5) and is worth a real decision: move to a three-way schema (full answer / partial answer / full abstention), or explicitly accept it as a rubric limitation.
+
+**Resolved since the original submission:** the original llama3-via-Ollama model was frequently too weak for the task — e.g., failing to reason that an R6 site falls within a stated "R1 through R10" range and abstaining incorrectly. Migrating generation, routing, and judging to the Gemini API (`gemini-3.6-flash`) resolved this class of failure; grounding is now near-perfect (19/20 cases) and the remaining gap is the abstention-rubric issue above, not model capability.

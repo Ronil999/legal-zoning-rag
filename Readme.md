@@ -16,7 +16,9 @@ Built as a take-home submission for the Planso Junior AI Engineer assignment.
 
 ![System Architecture](resources/IntelliSite_diagram.png)
 
-The pipeline accepts a BBL + natural-language question, routes it through an LLM router, performs hybrid retrieval (dense + sparse) for zoning queries, builds a route-aware prompt, generates an answer via local Ollama (llama3), then post-processes with citation grounding, temporal warnings, and a citation appendix before returning the response to the user.
+The pipeline accepts a BBL + natural-language question, routes it through an LLM router, performs hybrid retrieval (dense + sparse) for zoning queries, builds a route-aware prompt, generates an answer via the **Gemini API** (`gemini-3.6-flash`), then post-processes with citation grounding, temporal warnings, and a citation appendix before returning the response to the user.
+
+> The system originally ran on a local Ollama/llama3 model. It has since migrated to the Gemini API for generation, routing, and LLM-as-judge evaluation — see [`eval_stats.md`](eval_stats.md) for the before/after comparison.
 
 ---
 
@@ -46,7 +48,7 @@ chroma_db/                  ← download from Drive
 
 ## Installation
 
-**Requirements:** Python 3.10+, [Ollama](https://ollama.ai) installed and running locally.
+**Requirements:** Python 3.10+, a [Gemini API key](https://aistudio.google.com/apikey).
 
 ```bash
 # Clone the repo
@@ -59,9 +61,6 @@ source .venv/bin/activate        # Windows: .venv\Scripts\activate
 
 # Install dependencies
 pip install -r requirements.txt
-
-# Pull the required Ollama model
-ollama pull llama3
 ```
 
 ---
@@ -74,12 +73,15 @@ Create a `.env` file at the project root:
 PROJECT_ROOT=/absolute/path/to/intelli-site
 CHROMA_PATH=/absolute/path/to/intelli-site/chroma_db
 
+GEMINI_API_KEY=your-gemini-api-key
+
 # Optional (defaults shown)
 COLLECTION_NAME=zoning_docs
 EMBEDDING_MODEL=all-MiniLM-L6-v2
+GEMINI_MODEL=gemini-3.6-flash
 ```
 
-> ⚠️ `PROJECT_ROOT` must be set. The retriever resolves corpus paths relative to it and will fail on startup if it is missing.
+> ⚠️ `PROJECT_ROOT` and `GEMINI_API_KEY` must be set. The retriever resolves corpus paths relative to `PROJECT_ROOT`, and every LLM call site (router, generation, citation judge, eval judges) goes through `src/generation/gemini_client.py`, which raises on startup if `GEMINI_API_KEY` is missing.
 
 ---
 
@@ -115,9 +117,11 @@ print(result["formatted_response"])
 python eval.py
 ```
 
-This runs 20 test cases (15 answerable + 5 abstention) against the full pipeline and uses Ollama-as-judge to score grounding and abstention. Results are saved to `logs/eval_results.json`.
+This runs 20 test cases (15 answerable + 5 abstention) against the full pipeline and uses Gemini-as-judge to score grounding and abstention. Results are saved to `logs/eval_results.json`.
 
-> ⚠️ The tests in `src/tests/` are smoke scripts, not clean pytest suites — some call Ollama/retrieval at import time and may hang under `pytest`. Use `python eval.py` as the canonical evaluation command.
+> ⚠️ The tests in `src/tests/` are smoke scripts, not clean pytest suites — some call Gemini/retrieval at import time and may hang under `pytest`. Use `python eval.py` as the canonical evaluation command.
+
+**Latest results (post Gemini migration):** 13 PASS / 1 PARTIAL / 6 FAIL across 20 cases, with 19/20 cases scoring a perfect grounding score — see [`eval_stats.md`](eval_stats.md) for the full breakdown and failure analysis.
 
 ---
 
@@ -149,7 +153,7 @@ planso_assignment/
 │   │   ├── site_records.csv
 │   │   └── pluto_25v4.csv        # Download from Drive
 │   └── zoning/
-│       └── zr_01 … zr_10.md
+│       └── zr_01 … zr_14.md
 ├── chroma_db/                    
 ├── logs/
 │   ├── pipeline_logs.jsonl
@@ -163,6 +167,7 @@ planso_assignment/
     ├── retrieval/retriever.py    # Hybrid dense+sparse retriever
     ├── prompt_builder.py
     ├── generation/
+    │   ├── gemini_client.py       # Shared Gemini API client
     │   ├── llm.py
     │   └── validator.py
     ├── evaluation/
@@ -183,7 +188,8 @@ planso_assignment/
 ## Known Limitations
 
 - **Graph key mismatch:** Dependency expansion uses section IDs like `23-341`, but some graph node keys are stored as `23-341_body`. This can cause a section to be reported as missing even when a body node exists. Graph expansion is prototype-level.
-- **Ollama latency:** llama3 on CPU is slow (~15–45s per query). A GPU or a faster model (e.g., llama3:8b-q4) will improve throughput significantly.
-- **Corpus coverage:** The 10 zoning excerpts intentionally do not cover every question an architect might ask. The system is designed to abstain clearly when coverage is absent.
+- **Retrieval precision:** Hybrid retrieval + dependency expansion favors recall (77.78%) over precision (~18.9%) — extra topically-related chunks are returned alongside the correct one, which the LLM has to filter through at generation time. See [`eval_stats.md`](eval_stats.md).
+- **Abstention judgment on partial answers:** The current eval rubric scores abstention as binary (did/should abstain), so cases where the system correctly answers the covered part of a question and explicitly flags the uncovered part are scored as a miss rather than a good outcome. This accounts for most remaining FAILs — see the Analysis section in [`eval_stats.md`](eval_stats.md).
+- **Corpus coverage:** The 14 zoning excerpts intentionally do not cover every question an architect might ask. The system is designed to abstain clearly when coverage is absent.
 
 
