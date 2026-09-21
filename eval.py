@@ -276,6 +276,54 @@ TEST_CASES = [
         ),
         "should_abstain": True,
     },
+
+    # =====================================================
+    # EXPANDED CORPUS COVERAGE (R1-R5 / Commercial)
+    # =====================================================
+
+    {
+        "case_id": 21,
+        "label": "R4 maximum residential FAR",
+        "bbl": "3049930009",
+        "question": (
+            "What is the maximum residential "
+            "FAR allowed for this property?"
+        ),
+        "should_abstain": False,
+    },
+
+    {
+        "case_id": 22,
+        "label": "R3-2 lot coverage on corner lot",
+        "bbl": "5004980028",
+        "question": (
+            "What is the maximum lot coverage "
+            "allowed for this property?"
+        ),
+        "should_abstain": False,
+    },
+
+    {
+        "case_id": 23,
+        "label": "C4-2 commercial maximum FAR",
+        "bbl": "4049630075",
+        "question": (
+            "What is the maximum commercial "
+            "FAR allowed for this property?"
+        ),
+        "should_abstain": False,
+    },
+
+    {
+        "case_id": 24,
+        "label": "R4 flat-roof height limit",
+        "bbl": "3049930009",
+        "question": (
+            "What is the maximum building height "
+            "for a flat-roof building on this property?"
+        ),
+        "should_abstain": False,
+    },
 ]
 
 
@@ -311,9 +359,9 @@ def judge_grounding(
 
         str(
             c.get("text", "")
-        )[:1200]
+        )[:3000]
 
-        for c in chunks[:5]
+        for c in chunks[:8]
     )
 
     site_context = "\n".join(
@@ -432,9 +480,9 @@ def judge_abstention(
 
         str(
             c.get("text", "")
-        )[:1000]
+        )[:3000]
 
-        for c in chunks[:4]
+        for c in chunks[:8]
     )
 
     site_context = "\n".join(

@@ -1,0 +1,370 @@
+{
+  "metadata": {
+    "total_nodes": 22,
+    "total_edges": 18,
+    "corpus_gaps": [
+      "12-01",
+      "26-50",
+      "23-311",
+      "12-10",
+      "23-312",
+      "23-73",
+      "23-341",
+      "23-154",
+      "23-90",
+      "24-01",
+      "23-613",
+      "23-711"
+    ],
+    "generated_at": "2026-08-26T13:53:33.291106"
+  },
+  "nodes": {
+    "12-01_body": {
+      "node_id": "12-01_body",
+      "section_id": "12-01",
+      "section_title": "Section 12-01: Rules Applying to Text of Resolution",
+      "subsection_title": "Section 12-01: Rules Applying to Text of Resolution",
+      "source_file": "zr_01_rules_of_construction.md",
+      "document_title": "NYC Zoning Resolution \u2014 Article I, Chapter 2",
+      "last_amended": "2/2/2011",
+      "start_line": 1,
+      "end_line": 31,
+      "has_table": false,
+      "has_cross_ref": false,
+      "references": [],
+      "referenced_by": []
+    },
+    "12-02_body": {
+      "node_id": "12-02_body",
+      "section_id": "12-02",
+      "section_title": "Section 12-02: Rules for Interpretation of District Designations",
+      "subsection_title": "Section 12-02: Rules for Interpretation of District Designations",
+      "source_file": "zr_01_rules_of_construction.md",
+      "document_title": "NYC Zoning Resolution \u2014 Article I, Chapter 2",
+      "last_amended": "2/2/2011",
+      "start_line": 32,
+      "end_line": 41,
+      "has_table": false,
+      "has_cross_ref": false,
+      "references": [],
+      "referenced_by": []
+    },
+    "12-10_0": {
+      "node_id": "12-10_0",
+      "section_id": "12-10",
+      "section_title": "Section 12-10 (Excerpt): Selected Definitions",
+      "subsection_title": "abut, or abutting",
+      "source_file": "zr_02_definitions_key.md",
+      "document_title": "NYC Zoning Resolution \u2014 Article I, Chapter 2",
+      "last_amended": "8/14/2025",
+      "start_line": 10,
+      "end_line": 16,
+      "has_table": false,
+      "has_cross_ref": false,
+      "references": [],
+      "referenced_by": []
+    },
+    "12-10_1": {
+      "node_id": "12-10_1",
+      "section_id": "12-10",
+      "section_title": "Section 12-10 (Excerpt): Selected Definitions",
+      "subsection_title": "accessory use, or accessory",
+      "source_file": "zr_02_definitions_key.md",
+      "document_title": "NYC Zoning Resolution \u2014 Article I, Chapter 2",
+      "last_amended": "8/14/2025",
+      "start_line": 17,
+      "end_line": 35,
+      "has_table": false,
+      "has_cross_ref": false,
+      "references": [],
+      "referenced_by": []
+    },
+    "12-10_2": {
+      "node_id": "12-10_2",
+      "section_id": "12-10",
+      "section_title": "Section 12-10 (Excerpt): Selected Definitions",
+      "subsection_title": "floor area",
+      "source_file": "zr_02_definitions_key.md",
+      "document_title": "NYC Zoning Resolution \u2014 Article I, Chapter 2",
+      "last_amended": "8/14/2025",
+      "start_line": 36,
+      "end_line": 54,
+      "has_table": false,
+      "has_cross_ref": false,
+      "references": [],
+      "referenced_by": []
+    },
+    "12-10_3": {
+      "node_id": "12-10_3",
+      "section_id": "12-10",
+      "section_title": "Section 12-10 (Excerpt): Selected Definitions",
+      "subsection_title": "zoning lot",
+      "source_file": "zr_02_definitions_key.md",
+      "document_title": "NYC Zoning Resolution \u2014 Article I, Chapter 2",
+      "last_amended": "8/14/2025",
+      "start_line": 55,
+      "end_line": 64,
+      "has_table": false,
+      "has_cross_ref": false,
+      "references": [],
+      "referenced_by": []
+    },
+    "23-342": {
+      "node_id": "23-342",
+      "section_id": "23-34",
+      "section_title": "Section 23-34: Rear Yard and Rear Yard Equivalent Requirements",
+      "subsection_title": "23-342: Rear Yard Requirements",
+      "source_file": "zr_03_rear_yard_requirements.md",
+      "document_title": "NYC Zoning Resolution \u2014 Article II, Chapter 3",
+      "last_amended": "5/12/2021",
+      "start_line": 8,
+      "end_line": 30,
+      "has_table": true,
+      "has_cross_ref": true,
+      "references": [
+        "23-344",
+        "23-341"
+      ],
+      "referenced_by": [
+        "23-343"
+      ]
+    },
+    "23-343": {
+      "node_id": "23-343",
+      "section_id": "23-34",
+      "section_title": "Section 23-34: Rear Yard and Rear Yard Equivalent Requirements",
+      "subsection_title": "23-343: Rear Yard Equivalent Requirements",
+      "source_file": "zr_03_rear_yard_requirements.md",
+      "document_title": "NYC Zoning Resolution \u2014 Article II, Chapter 3",
+      "last_amended": "5/12/2021",
+      "start_line": 31,
+      "end_line": 36,
+      "has_table": false,
+      "has_cross_ref": true,
+      "references": [
+        "23-342"
+      ],
+      "referenced_by": []
+    },
+    "23-344": {
+      "node_id": "23-344",
+      "section_id": "23-34",
+      "section_title": "Section 23-34: Rear Yard and Rear Yard Equivalent Requirements",
+      "subsection_title": "23-344: Additional Rear Yard Modifications",
+      "source_file": "zr_03_rear_yard_requirements.md",
+      "document_title": "NYC Zoning Resolution \u2014 Article II, Chapter 3",
+      "last_amended": "5/12/2021",
+      "start_line": 37,
+      "end_line": 45,
+      "has_table": false,
+      "has_cross_ref": true,
+      "references": [
+        "23-711"
+      ],
+      "referenced_by": [
+        "23-342"
+      ]
+    },
+    "23-341_body": {
+      "node_id": "23-341_body",
+      "section_id": "23-341",
+      "section_title": "Section 23-341: Permitted Obstructions in Required Rear Yards or Rear Yard Equivalents",
+      "subsection_title": "Section 23-341: Permitted Obstructions in Required Rear Yards or Rear Yard Equivalents",
+      "source_file": "zr_04_permitted_obstructions_rear_yard.md",
+      "document_title": "NYC Zoning Resolution \u2014 Article II, Chapter 3",
+      "last_amended": "11/10/2022",
+      "start_line": 1,
+      "end_line": 24,
+      "has_table": false,
+      "has_cross_ref": true,
+      "references": [
+        "12-01",
+        "26-50"
+      ],
+      "referenced_by": []
+    },
+    "23-22_body": {
+      "node_id": "23-22_body",
+      "section_id": "23-22",
+      "section_title": "Section 23-22: Floor Area Regulations for R6 Through R10 Districts",
+      "subsection_title": "Section 23-22: Floor Area Regulations for R6 Through R10 Districts",
+      "source_file": "zr_06_floor_area_R6_R10_SUPERSEDED_2019.md",
+      "document_title": "NYC Zoning Resolution \u2014 Article II, Chapter 3",
+      "last_amended": "",
+      "start_line": 1,
+      "end_line": 32,
+      "has_table": true,
+      "has_cross_ref": true,
+      "references": [
+        "23-90"
+      ],
+      "referenced_by": []
+    },
+    "23-321": {
+      "node_id": "23-321",
+      "section_id": "23-32",
+      "section_title": "Section 23-32: Front Yard Requirements",
+      "subsection_title": "23-321: Basic Front Yard Requirements in R1 Through R5 Districts",
+      "source_file": "zr_07_front_yard_requirements.md",
+      "document_title": "NYC Zoning Resolution \u2014 Article II, Chapter 3",
+      "last_amended": "6/3/2020",
+      "start_line": 8,
+      "end_line": 32,
+      "has_table": true,
+      "has_cross_ref": true,
+      "references": [
+        "23-613",
+        "23-311",
+        "23-312"
+      ],
+      "referenced_by": []
+    },
+    "23-322": {
+      "node_id": "23-322",
+      "section_id": "23-32",
+      "section_title": "Section 23-32: Front Yard Requirements",
+      "subsection_title": "23-322: Front Yard Requirements for R6 Through R12 Districts",
+      "source_file": "zr_07_front_yard_requirements.md",
+      "document_title": "NYC Zoning Resolution \u2014 Article II, Chapter 3",
+      "last_amended": "6/3/2020",
+      "start_line": 33,
+      "end_line": 35,
+      "has_table": false,
+      "has_cross_ref": true,
+      "references": [
+        "23-431",
+        "23-433"
+      ],
+      "referenced_by": []
+    },
+    "23-311_body": {
+      "node_id": "23-311_body",
+      "section_id": "23-311",
+      "section_title": "Section 23-311: Permitted Obstructions in All Yards, Courts and Open Areas",
+      "subsection_title": "Section 23-311: Permitted Obstructions in All Yards, Courts and Open Areas",
+      "source_file": "zr_08_permitted_obstructions_all_yards.md",
+      "document_title": "NYC Zoning Resolution \u2014 Article II, Chapter 3",
+      "last_amended": "11/10/2022",
+      "start_line": 1,
+      "end_line": 26,
+      "has_table": false,
+      "has_cross_ref": true,
+      "references": [
+        "23-341",
+        "26-50"
+      ],
+      "referenced_by": []
+    },
+    "09_ceqr_e_designations_section_0_body": {
+      "node_id": "09_ceqr_e_designations_section_0_body",
+      "section_id": "09_ceqr_e_designations_section_0",
+      "section_title": "City Environmental Quality Review (CEQR): (E) Designations \u2014 Excerpt",
+      "subsection_title": "City Environmental Quality Review (CEQR): (E) Designations \u2014 Excerpt",
+      "source_file": "zr_09_ceqr_e_designations.md",
+      "document_title": "NYC Zoning Resolution \u2014 Appendix C, Table 1",
+      "last_amended": "",
+      "start_line": 1,
+      "end_line": 7,
+      "has_table": false,
+      "has_cross_ref": false,
+      "references": [],
+      "referenced_by": []
+    },
+    "09_ceqr_e_designations_section_1_body": {
+      "node_id": "09_ceqr_e_designations_section_1_body",
+      "section_id": "09_ceqr_e_designations_section_1",
+      "section_title": "What is an (E) Designation?",
+      "subsection_title": "What is an (E) Designation?",
+      "source_file": "zr_09_ceqr_e_designations.md",
+      "document_title": "NYC Zoning Resolution \u2014 Appendix C, Table 1",
+      "last_amended": "",
+      "start_line": 8,
+      "end_line": 20,
+      "has_table": false,
+      "has_cross_ref": false,
+      "references": [],
+      "referenced_by": []
+    },
+    "09_ceqr_e_designations_section_2_body": {
+      "node_id": "09_ceqr_e_designations_section_2_body",
+      "section_id": "09_ceqr_e_designations_section_2",
+      "section_title": "How to Use This Table",
+      "subsection_title": "How to Use This Table",
+      "source_file": "zr_09_ceqr_e_designations.md",
+      "document_title": "NYC Zoning Resolution \u2014 Appendix C, Table 1",
+      "last_amended": "",
+      "start_line": 21,
+      "end_line": 28,
+      "has_table": false,
+      "has_cross_ref": false,
+      "references": [],
+      "referenced_by": []
+    },
+    "09_ceqr_e_designations_section_3_body": {
+      "node_id": "09_ceqr_e_designations_section_3_body",
+      "section_id": "09_ceqr_e_designations_section_3",
+      "section_title": "Sample Records (Illustrative \u2014 not a complete listing)",
+      "subsection_title": "Sample Records (Illustrative \u2014 not a complete listing)",
+      "source_file": "zr_09_ceqr_e_designations.md",
+      "document_title": "NYC Zoning Resolution \u2014 Appendix C, Table 1",
+      "last_amended": "",
+      "start_line": 29,
+      "end_line": 37,
+      "has_table": true,
+      "has_cross_ref": false,
+      "references": [],
+      "referenced_by": []
+    },
+    "23-431": {
+      "node_id": "23-431",
+      "section_id": "23-43",
+      "section_title": "Section 23-43: Height and Setback Requirements in R6 Through R12 Districts",
+      "subsection_title": "23-431: Street Wall Location Requirements",
+      "source_file": "zr_10_height_setback_R6_R12.md",
+      "document_title": "NYC Zoning Resolution \u2014 Article II, Chapter 3",
+      "last_amended": "4/30/2024",
+      "start_line": 8,
+      "end_line": 19,
+      "has_table": false,
+      "has_cross_ref": false,
+      "references": [],
+      "referenced_by": [
+        "23-322"
+      ]
+    },
+    "23-432": {
+      "node_id": "23-432",
+      "section_id": "23-43",
+      "section_title": "Section 23-43: Height and Setback Requirements in R6 Through R12 Districts",
+      "subsection_title": "23-432: Height and Setback Requirements",
+      "source_file": "zr_10_height_setback_R6_R12.md",
+      "document_title": "NYC Zoning Resolution \u2014 Article II, Chapter 3",
+      "last_amended": "4/30/2024",
+      "start_line": 20,
+      "end_line": 45,
+      "has_table": true,
+      "has_cross_ref": true,
+      "references": [
+        "23-73"
+      ],
+      "referenced_by": []
+    },
+    "23-433": {
+      "node_id": "23-433",
+      "section_id": "23-43",
+      "section_title": "Section 23-43: Height and Setback Requirements in R6 Through R12 Districts",
+      "subsection_title": "23-433: Standard Setback Regulations",
+      "source_file": "zr_10_height_setback_R6_R12.md",
+      "document_title": "NYC Zoning Resolution \u2014 Article II, Chapter 3",
+      "last_amended": "4/30/2024",
+      "start_line": 46,
+      "end_line": 50,
+      "has_table": false,
+      "has_cross_ref": false,
+      "references": [],
+      "referenced_by": [
+        "23-322"
+      ]
+    }
+  }
+}
